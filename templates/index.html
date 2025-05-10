@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>TikTok Video Downloader</title>
+    <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+    <div class="container">
+        <h2>Download TikTok Video</h2>
+        <form method="post" action="/download">
+            <label for="url">TikTok Video URL:</label>
+            <input type="text" id="url" name="url" placeholder="Masukkan URL TikTok" required />
+            <button type="submit">Download</button>
+        </form>
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+    </div>
+</body>
+</html>
