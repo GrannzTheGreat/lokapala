@@ -18,13 +18,31 @@
                 const data = await response.json();
                 document.getElementById('videoInfo').innerText =
                     `Author: ${data.author_name}\nSong: ${data.song_name}\nDescription: ${data.description}`;
-                document.getElementById('downloadBtn').style.display = 'inline';
-                document.getElementById('downloadBtn').onclick = () => {
-                    window.location.href = `/download_video?url=${encodeURIComponent(url)}`;
-                };
+                // Setelah info diambil, otomatis mulai download
+                downloadVideo();
             } else {
                 alert("Gagal mendapatkan info video");
             }
+        }
+
+        async function downloadVideo() {
+            const url = document.getElementById('tiktokUrl').value;
+            const response = await fetch(`/download_video?url=${encodeURIComponent(url)}`);
+            if (!response.ok) {
+                alert("Gagal mendownload video");
+                return;
+            }
+            const blob = await response.blob();
+            const urlObject = URL.createObjectURL(blob);
+
+            // Membuat link dan otomatis klik untuk download
+            const a = document.createElement('a');
+            a.href = urlObject;
+            a.download = 'tiktok_video.mp4'; // Nama file
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(urlObject);
         }
     </script>
 </body>

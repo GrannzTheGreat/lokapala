@@ -19,6 +19,7 @@ class VideoMetadata(BaseModel):
 async def get_video_info(url: str = Query(..., description="Link TikTok Video")):
     try:
         video = api.video(url=url)
+        # Pastikan atribut ini tersedia di versi TikTokApi 7.1.0
         return VideoMetadata(
             video_url=video.video_url,
             author_name=video.author.username,
@@ -26,7 +27,7 @@ async def get_video_info(url: str = Query(..., description="Link TikTok Video"))
             description=video.description
         )
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=f"Error fetching video info: {str(e)}")
 
 @app.get("/download_video")
 async def download_video(url: str = Query(..., description="Link TikTok Video")):
@@ -40,4 +41,4 @@ async def download_video(url: str = Query(..., description="Link TikTok Video"))
             headers={"Content-Disposition": "attachment; filename=tiktok_video.mp4"}
         )
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=f"Error downloading video: {str(e)}")
