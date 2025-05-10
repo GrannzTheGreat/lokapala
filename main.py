@@ -21,6 +21,7 @@ api = TikTokApi()
 async def index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request, "error": None})
 
+
 @app.post("/download")
 async def download(request: Request):
     form = await request.form()
@@ -32,10 +33,29 @@ async def download(request: Request):
         # Mengambil data video dengan TikTokApi
         tiktok_data = api.get_video_by_url(url)
         video_url = tiktok_data.get('video', {}).get('downloadAddr')
+
         if not video_url:
-            raise Exception("Tidak dapat mendapatkan URL video")
-    except Exception:
-        return templates.TemplateResponse("index.html", {"request": request, "error": "Gagal mendapatkan video dari TikTok API."})
+            raise Exception("Tidak dapat mendapatkan URL video dari TikTok API.")
+
+        # Download video dari URL
+        filename = f"videos/{uuid.uuid4()}.mp4"
+        os.makedirs("videos", exist_ok=True)
+
+        response = requests.get(video_url)
+        if response.status_code == 200:
+            with open(filename, 'wb') as f:
+                f.write(response.content)
+        else:
+            return templates.TemplateResponse("index.html", {"request": request, "error": "Gagal mengunduh video."})
+
+        # Kirim file ke pengguna
+        return FileResponse(path=filename, media_type='video/mp4', filename='tiktok_video.mp4')
+
+    except Exception as e:
+        print("Error di /download:", e)
+        # Jika error terjadi, tampilkan halaman dengan pesan error
+        return templates.TemplateResponse("index.html", {"request": request,
+                                                         "error": "Terjadi kesalahan saat memproses video. Pastikan URL valid dan API berjalan dengan baik."})
 
     # Download video dari URL
     filename = f"videos/{uuid.uuid4()}.mp4"
