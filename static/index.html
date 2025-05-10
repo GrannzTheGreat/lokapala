@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TikTok Video Downloader</title>
+</head>
+<body>
+    <h1>TikTok Video Downloader</h1>
+    <input type="text" id="tiktokUrl" placeholder="Paste TikTok URL here" size="50"/>
+    <button onclick="fetchVideoInfo()">Get Info</button>
+    <p id="videoInfo"></p>
+    <button id="downloadBtn" style="display:none;">Download Video</button>
+
+    <script>
+        async function fetchVideoInfo() {
+            const url = document.getElementById('tiktokUrl').value;
+            const response = await fetch(`/get_video_info?url=${encodeURIComponent(url)}`);
+            if (response.ok) {
+                const data = await response.json();
+                document.getElementById('videoInfo').innerText =
+                    `Author: ${data.author_name}\nSong: ${data.song_name}\nDescription: ${data.description}`;
+                document.getElementById('downloadBtn').style.display = 'inline';
+                document.getElementById('downloadBtn').onclick = () => {
+                    window.location.href = `/download_video?url=${encodeURIComponent(url)}`;
+                };
+            } else {
+                alert("Gagal mendapatkan info video");
+            }
+        }
+    </script>
+</body>
+</html>
